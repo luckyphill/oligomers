@@ -58,7 +58,12 @@ function filename = parameter_space(ODE, BC, res, p, r)
 	    end
 	end
 
+	if ~exist(func2str(ODE),'dir')
+		mkdir(func2str(ODE));
+	end
+
+	filename = [func2str(ODE), '/', filename];
 	% Save all the data
-	save([func2str(ODE), '/', filename],'etagrid','p','r','res','ODE','BC','K1','K2');
+	save(filename,'etagrid','p','r','res','ODE','BC','K1','K2');
 
 end

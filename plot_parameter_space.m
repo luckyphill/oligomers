@@ -57,6 +57,6 @@ function plot_parameter_space(filename)
 	pos = get(h,'Position');
 	set(h,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
 
-	print([func2str(ODE), '/', filename],'-dpdf')
+	print(filename,'-dpdf')
 
 end
