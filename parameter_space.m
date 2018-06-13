@@ -47,7 +47,10 @@ function filename = parameter_space(ODE, BC, res, p, r)
 
 
 	% Generate the filename
-	filename = ['eta_', func2str(ODE),'_',p.signal,'_n_',num2str(p.n),'_K3_', num2str(p.K3),'_K6_',num2str(p.K6)];
+	filename = ['eta_', func2str(ODE),'_',p.signal,'_n_',num2str(p.n),'_K3_', num2str(p.K3)];
+	if isfield(p,'K6')
+		filename = [filename, '_K6_', num2str(p.q)];
+	end
 	if isfield(p,'q')
 		filename = [filename, '_q_', num2str(p.q)];
 	end
