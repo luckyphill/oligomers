@@ -6,6 +6,6 @@ function res = oligomer_BC(Ma,Mb,p)
        res(k) = Ma(p.n+k);
        res(p.n+k)= Mb(k);
     end
-    res(p.n) = Ma(2*p.n)+p.K3;
+    res(p.n) = Ma(2*p.n)+p.K3/p.n^(2/3);
     res(2*p.n) = Mb(p.n);
 end

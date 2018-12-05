@@ -2,7 +2,10 @@ function [signal_gradient, varargout] = generate_gradient(ODE, BC, p)
 	% Runs solve oligomer and then deals with the output depending on the system we are solving
     % Can also optionally return all the bound receptor profiles for each oligomer
 
-	M = solve_oligomer(ODE, BC, p);
+    % M_full includes the first derivative
+	M_full = solve_oligomer(ODE, BC, p);
+    % Only need the first n results, the remainder are first derivatives
+    M = M_full(1:p.n_numerical,:);
 	
     switch p.signal
     case 'monomer'
@@ -10,10 +13,10 @@ function [signal_gradient, varargout] = generate_gradient(ODE, BC, p)
     	M1=M(1,:);
         
         if isfield(p,'C')
-             C_max = max(abs(p.C(:,1)));
-             signal_gradient = C_max * p.K1.* M1 ./ (p.K2 + C_max * M1); % resulting B concentration profile when only monomers can bind
+             %p.C_max = 1;%max(abs(p.C(:,1)));
+             signal_gradient = p.C_max * M1 ./ (p.K2 + p.C_max * M1); % resulting B concentration profile when only monomers can bind
          else
-             signal_gradient = p.K1.* M1 ./ (p.K2 + M1); % resulting B concentration profile when only monomers can bind
+             signal_gradient = M1 ./ (p.K2 + M1); % resulting B concentration profile when only monomers can bind
          end
 
         varargout{1} = M;
@@ -29,8 +32,8 @@ function [signal_gradient, varargout] = generate_gradient(ODE, BC, p)
             Mwsum = Mwsum + i * M(i,:); %oligomers signal for each monomer
         end
 
-        B_olig = p.K1.* M ./ (p.K2 + Msum); % resulting B concentration profiles when oligomers can bind
-        signal_gradient = p.K1.* Msum ./ (p.K2 + Msum); % signal profile - oligomers signal once
+        B_olig = M ./ (p.K2 + Msum); % resulting B concentration profiles when oligomers can bind
+        signal_gradient = Msum ./ (p.K2 + Msum); % signal profile - oligomers signal once
         
         varargout{1} = M;
         varargout{2} = B_olig;
@@ -45,8 +48,8 @@ function [signal_gradient, varargout] = generate_gradient(ODE, BC, p)
             Mwsum = Mwsum + i * M(i,:); %oligomers signal for each monomer
         end
 
-        B_olig = p.K1.* M ./ (p.K2 + Msum); % resulting B concentration profiles when oligomers can bind
-        signal_gradient = p.K1.* Mwsum ./ (p.K2 + Msum); % signal profile - oligomers signal multiple times
+        B_olig = M ./ (p.K2 + Msum); % resulting B concentration profiles when oligomers can bind
+        signal_gradient = Mwsum ./ (p.K2 + Msum); % signal profile - oligomers signal multiple times
         
         varargout{1} = M;
         varargout{2} = B_olig;
@@ -55,6 +58,7 @@ function [signal_gradient, varargout] = generate_gradient(ODE, BC, p)
         fprintf('Invalid signal specifier. Choose one of monomer, single or multiple');
 
     end
+    varargout{3} = M_full;
 
 
 end

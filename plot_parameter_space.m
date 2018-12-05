@@ -1,8 +1,8 @@
-function plot_parameter_space(filename)
+function plot_parameter_space(file_path)
 	% Works with or without file extension
 	% Only works with the new data structure
 
-	load(filename);
+	load(file_path);
 
 	for i=1:res
 	    for j=1:res
@@ -10,6 +10,9 @@ function plot_parameter_space(filename)
 	                etagrid(i,j)=0;
 	            end
 	            if etagrid(i,j)==10
+	                etagrid(i,j)=0;
+	            end
+	            if etagrid(i,j)==-1
 	                etagrid(i,j)=0;
 	            end
 	    end
@@ -24,7 +27,8 @@ function plot_parameter_space(filename)
 
 	% Plot the figure and set axis labels etc.
 	h = figure();
-	imagesc(rot90(etagrid),[0 1])
+	set(gcf,'Visible', 'off'); 
+	imagesc(rot90(etagrid),'AlphaData',~isnan(rot90(etagrid)), [0,1])
 	colormap jet
 	set(gca, 'XTick', linspace(.5, res + .5, numticks))
 	set(gca, 'XTickLabel', fliplr(ticklabel_x))
@@ -39,24 +43,24 @@ function plot_parameter_space(filename)
 	plot_name = func2str(ODE);
 	plot_title{1} = [plot_name, ' ', p.signal, ' signalling'];
 
-	if isfield(p,'n')
-		plot_title{2} = ['$\eta$ with $n$=' num2str(p.n) ', $K_3$=' num2str(p.K3) ', $K_6$=' num2str(p.K6)];
-	else
+	if p.n == 1
 		plot_title{1} = ['MUB $\eta$ with $K_3$=' num2str(p.K3)];
-	end
-
-	if isfield(p,'q')
-		plot_title{2} = [plot_title{2}, ', $q$=', num2str(p.q)];
+	else
+		plot_title{2} = ['$\eta$ with $n$=' num2str(p.n) ', $K_3$=' num2str(p.K3) ', $K_6$=' num2str(p.K6)];
+		if isfield(p,'q')
+			plot_title{2} = [plot_title{2}, ', $q$=', num2str(p.q)];
+		end
 	end
 
 	title(plot_title, 'Interpreter','latex','FontSize',20);
-
 	
 	% Save the plot to pdf
 	set(h,'Units','Inches');
 	pos = get(h,'Position');
 	set(h,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
 
-	print(filename,'-dpdf')
+	print(file_path,'-dpdf')
+
+	close(h);
 
 end
