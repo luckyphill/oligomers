@@ -5,3 +5,5 @@
 Plots/*
 */*.pdf
 *.pdf
+*/*.mat
+*.mat
